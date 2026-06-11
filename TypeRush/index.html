@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeRush LAN</title>
+<style>
+  :root {
+    --bg-main: #f4ede4;
+    --bg-accent: #e7d8c7;
+    --card: rgba(255, 250, 244, 0.92);
+    --card-soft: #f8f2ea;
+    --line: #dcc8b4;
+    --text: #4d3a2d;
+    --muted: #8d7462;
+    --primary: #8c6a52;
+    --primary-dark: #6c503d;
+    --secondary: #a4866a;
+    --sage: #8d9b84;
+    --olive: #6f7f5f;
+    --danger: #b96f5d;
+    --warning: #d0a96f;
+    --shadow: 0 16px 40px rgba(92, 67, 46, 0.12);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+    background:
+      radial-gradient(circle at top left, rgba(255,255,255,0.55), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(141,155,132,0.18), transparent 28%),
+      linear-gradient(135deg, var(--bg-main), var(--bg-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 760px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.55);
+    color: var(--primary-dark);
+    border: 1px solid rgba(140,106,82,0.18);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 20px rgba(110, 82, 59, 0.06);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    line-height: 1;
+    margin-bottom: 8px;
+    color: var(--primary-dark);
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 0.98rem;
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(140,106,82,0.12);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 28px;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+  }
+
+  .section-subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+
+  .grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field { margin-bottom: 16px; }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 14px 15px;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.2s ease;
+  }
+
+  input[type="text"]:focus,
+  textarea:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 4px rgba(164, 134, 106, 0.15);
+  }
+
+  textarea {
+    resize: none;
+    line-height: 1.6;
+    min-height: 120px;
+    font-family: inherit;
+  }
+
+  textarea:disabled {
+    background: #f0e8df;
+    color: #7d6958;
+    cursor: not-allowed;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .btn {
+    border: 0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    min-width: 200px;
+    box-shadow: 0 12px 24px rgba(140,106,82,0.24);
+  }
+  .btn-primary:hover { opacity: 0.94; }
+  .btn-soft {
+    background: var(--card-soft);
+    color: var(--primary-dark);
+    border: 1px solid var(--line);
+  }
+  .btn-soft:hover { background: #f1e8de; }
+
+  .status-box {
+    display: none;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .status-box.error {
+    display: block;
+    background: rgba(185,111,93,0.12);
+    color: #8e4d3d;
+    border: 1px solid rgba(185,111,93,0.24);
+  }
+
+  .tips-box {
+    margin-top: 16px;
+    background: rgba(141,155,132,0.12);
+    border: 1px solid rgba(141,155,132,0.24);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .tips-box strong { color: var(--olive); }
+  .tips-box ul {
+    margin-top: 8px;
+    padding-left: 18px;
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 0.92rem;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(141,155,132,0.12);
+    color: var(--olive);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .player-slots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 18px 0 14px;
+  }
+
+  .player-slot {
+    border-radius: 18px;
+    padding: 18px;
+    background: #f9f3ec;
+    border: 1px dashed var(--line);
+    color: var(--muted);
+    text-align: center;
+    min-height: 104px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .player-slot.filled {
+    background: rgba(141,155,132,0.14);
+    border-style: solid;
+    border-color: rgba(111,127,95,0.28);
+    color: var(--olive);
+  }
+
+  .slot-icon {
+    font-size: 1.65rem;
+  }
+
+  .info-log {
+    background: #fcf8f3;
+    border: 1px solid rgba(140,106,82,0.1);
+    border-radius: 16px;
+    padding: 14px 16px;
+    min-height: 92px;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+
+  .info-log p {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 0.92rem;
+  }
+  .info-log p::before {
+    content: "• ";
+    color: var(--secondary);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    background: #fffaf4;
+    border: 1px solid rgba(140,106,82,0.1);
+    border-radius: 18px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .stat-card .value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+  }
+
+  .stat-card .label {
+    margin-top: 4px;
+    font-size: 0.76rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .progress-wrap {
+    height: 10px;
+    background: #ebded0;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--sage), var(--secondary));
+    transition: width 0.1s linear;
+  }
+
+  .sentence-box {
+    background: #fffaf5;
+    border: 1px solid rgba(140,106,82,0.12);
+    border-radius: 18px;
+    padding: 18px 20px;
+    min-height: 114px;
+    font-size: 1.08rem;
+    line-height: 1.9;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .sentence-box .char.correct { color: var(--olive); }
+  .sentence-box .char.wrong { color: var(--danger); background: rgba(185,111,93,0.12); border-radius: 4px; }
+  .sentence-box .char.cursor {
+    background: rgba(164,134,106,0.18);
+    border-radius: 4px;
+  }
+
+  .hint-text {
+    margin-top: 8px;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  .waiting-msg, .winner-banner {
+    border-radius: 18px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    background: rgba(164,134,106,0.12);
+    color: var(--primary-dark);
+    border: 1px solid rgba(164,134,106,0.18);
+  }
+
+  .lb-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+  }
+
+  .lb-sub {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 18px;
+    font-size: 0.94rem;
+  }
+
+  .lb-entry {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(140,106,82,0.12);
+    background: #fffcf8;
+    margin-bottom: 12px;
+  }
+  .lb-entry.rank-1 {
+    background: linear-gradient(135deg, rgba(208,169,111,0.17), rgba(255,250,241,0.95));
+    border-color: rgba(208,169,111,0.28);
+  }
+
+  .lb-rank {
+    font-size: 1.9rem;
+    width: 54px;
+    text-align: center;
+  }
+
+  .lb-name {
+    font-weight: 800;
+    color: var(--primary-dark);
+    font-size: 1rem;
+  }
+
+  .lb-score {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--olive);
+  }
+
+  .lb-meta {
+    text-align: right;
+    font-size: 0.84rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .footer-note {
+    margin-top: 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 760px) {
+    .card { padding: 22px; }
+    .grid-two, .player-slots, .stats-row { grid-template-columns: 1fr; }
+    .lb-entry {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .lb-meta { text-align: center; }
+    .btn-row { flex-direction: column; }
+    .btn-primary, .btn-soft { width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hero">
+      <div class="badge">⌨️ TypeRush LAN · Komunikasi Data</div>
+      <h1>TypeRush LAN</h1>
+      <p>
+        Game adu cepat mengetik berbasis client-server dengan tampilan earth tone yang hangat.
+        Masuk ke room, tunggu lawan, lalu ketik kalimat secepat dan setepat mungkin.
+      </p>
+    </div>
+
+    <div id="screen-login" class="screen active card">
+      <div class="section-title">Masuk ke Room</div>
+      <div class="section-subtitle">Hubungkan browser ke server dan mulai pertandingan typing battle yang santai tapi kompetitif.</div>
+      <div class="grid-two">
+        <div class="field">
+          <label>Server IP</label>
+          <input type="text" id="input-host" placeholder="contoh: 192.168.1.10" value="localhost">
+        </div>
+        <div class="field">
+          <label>Nama Pemain</label>
+          <input type="text" id="input-name" placeholder="masukkan namamu" maxlength="20">
+        </div>
+      </div>
+      <div id="login-status" class="status-box"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="doLogin()">Masuk ke Room</button>
+      </div>
+      <div class="tips-box">
+        <strong>Cara menjalankan versi web:</strong>
+        <ul>
+          <li>Jalankan server.py terlebih dahulu.</li>
+          <li>Jalankan <code>python ws_bridge.py</code> untuk bridge WebSocket.</li>
+          <li>Buka file ini di 2 tab atau 2 perangkat berbeda dalam LAN yang sama.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="screen-waiting" class="screen card">
+      <div class="status-pill">⏳ Waiting Room Aktif</div>
+      <div class="section-title">Menunggu pemain lain</div>
+      <div class="section-subtitle">Game dimulai otomatis saat room sudah penuh. Sambil menunggu, siapkan posisi tanganmu ya.</div>
+      <div class="player-slots" id="player-slots"></div>
+      <div class="info-log" id="info-log-wait"></div>
+    </div>
+
+    <div id="screen-game" class="screen card">
+      <div class="section-title">Round Sedang Berjalan</div>
+      <div class="section-subtitle">Fokus pada ketepatan dan kecepatan. Semakin cepat dan akurat, semakin tinggi skormu.</div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="value" id="stat-timer">0.0s</div><div class="label">Waktu</div></div>
+        <div class="stat-card"><div class="value" id="stat-acc">0%</div><div class="label">Akurasi</div></div>
+        <div class="stat-card"><div class="value" id="stat-chars">0</div><div class="label">Karakter</div></div>
+        <div class="stat-card"><div class="value" id="stat-progress">0%</div><div class="label">Progress</div></div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+      <label>Kalimat yang harus diketik</label>
+      <div class="sentence-box" id="sentence-display"></div>
+      <label>Ketik ulang kalimat di bawah ini</label>
+      <textarea id="typing-area" placeholder="Mulai mengetik di sini..." oninput="onTyping()" onpaste="return false"></textarea>
+      <div class="hint-text">Tip: salin secara manual ya, paste dinonaktifkan supaya permainan lebih fair.</div>
+      <div class="info-log" id="info-log-game" style="margin-top:16px"></div>
+    </div>
+
+    <div id="screen-leaderboard" class="screen card">
+      <div class="lb-title">🏆 Leaderboard</div>
+      <div class="lb-sub">Hasil akhir pertandingan TypeRush LAN</div>
+      <div id="winner-banner" class="winner-banner" style="display:none"></div>
+      <div id="lb-entries"></div>
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn btn-primary" onclick="playAgain()">Main Lagi</button>
+        <button class="btn btn-soft" onclick="goHome()">Kembali ke Login</button>
+      </div>
+      <div class="footer-note">Setiap ronde akan mengambil kalimat secara acak dari server, jadi permainan terasa lebih variatif.</div>
+    </div>
+  </div>
+
+<script>
+let ws = null;
+let playerName = "";
+let sentence = "";
+let startTime = null;
+let timerInterval = null;
+let submitted = false;
+let players = [];
+let lastLeaderboard = [];
+
+function connect(host, name) {
+  const wsUrl = `ws://${host}:5001`;
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => send({ type: "login", name });
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      handleMessage(msg);
+    } catch (_) {}
+  };
+
+  ws.onerror = () => {
+    showLoginError("Tidak bisa terhubung. Pastikan ws_bridge.py sudah berjalan.");
+  };
+
+  ws.onclose = () => {
+    if (!submitted && document.getElementById("screen-leaderboard").classList.contains("active") === false) {
+      addLog("Koneksi ke server terputus.", currentLogTarget());
+    }
+  };
+}
+
+function send(msg) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(msg));
+  }
+}
+
+function handleMessage(msg) {
+  switch (msg.type) {
+    case "error":
+      showLoginError(msg.message);
+      break;
+    case "joined":
+      showScreen("waiting");
+      players = [playerName];
+      renderSlots();
+      addLog(msg.message, "wait");
+      break;
+    case "info":
+      addLog(msg.message, currentLogTarget());
+      const match = msg.message.match(/^(.+) bergabung/);
+      if (match && !players.includes(match[1])) {
+        players.push(match[1]);
+        renderSlots();
+      }
+      if (msg.message.includes("keluar dari room")) {
+        const quitter = msg.message.split(" keluar")[0];
+        players = players.filter(p => p !== quitter);
+        renderSlots();
+      }
+      break;
+    case "start":
+      sentence = msg.sentence;
+      startGame();
+      break;
+    case "ack":
+      addLog(msg.message, "game");
+      document.getElementById("typing-area").disabled = true;
+      stopTimer();
+      break;
+    case "leaderboard":
+      lastLeaderboard = msg.data || [];
+      showLeaderboard(lastLeaderboard);
+      break;
+  }
+}
+
+function currentLogTarget() {
+  return document.getElementById("screen-game").classList.contains("active") ? "game" : "wait";
+}
+
+function doLogin() {
+  const host = document.getElementById("input-host").value.trim() || "localhost";
+  const name = document.getElementById("input-name").value.trim();
+  if (!name) {
+    showLoginError("Nama tidak boleh kosong.");
+    return;
+  }
+  playerName = name;
+  submitted = false;
+  players = [];
+  clearLogs();
+  hideLoginError();
+  connect(host, name);
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById("login-status");
+  el.textContent = msg;
+  el.className = "status-box error";
+}
+
+function hideLoginError() {
+  const el = document.getElementById("login-status");
+  el.textContent = "";
+  el.className = "status-box";
+}
+
+document.getElementById("input-name").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") doLogin();
+});
+
+function renderSlots() {
+  const wrap = document.getElementById("player-slots");
+  wrap.innerHTML = "";
+  for (let i = 0; i < 2; i++) {
+    const slot = document.createElement("div");
+    slot.className = "player-slot" + (players[i] ? " filled" : "");
+    slot.innerHTML = players[i]
+      ? `<div class="slot-icon">🌿</div><div><strong>${escHtml(players[i])}</strong><br><span>Siap bertanding</span></div>`
+      : `<div class="slot-icon">☕</div><div><strong>Slot ${i + 1}</strong><br><span>Menunggu pemain...</span></div>`;
+    wrap.appendChild(slot);
+  }
+}
+
+function startGame() {
+  showScreen("game");
+  submitted = false;
+  document.getElementById("typing-area").value = "";
+  document.getElementById("typing-area").disabled = false;
+  document.getElementById("typing-area").focus();
+  document.getElementById("stat-timer").textContent = "0.0s";
+  document.getElementById("stat-acc").textContent = "0%";
+  document.getElementById("stat-chars").textContent = "0";
+  document.getElementById("stat-progress").textContent = "0%";
+  document.getElementById("progress-bar").style.width = "0%";
+  document.getElementById("info-log-game").innerHTML = "";
+  renderSentence("", sentence);
+  startTime = Date.now();
+  startTimer();
+  addLog("Ronde dimulai. Ketik kalimat secepat mungkin!", "game");
+}
+
+function startTimer() {
+  stopTimer();
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    document.getElementById("stat-timer").textContent = elapsed.toFixed(1) + "s";
+  }, 100);
+}
+
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+}
+
+function onTyping() {
+  const typed = document.getElementById("typing-area").value;
+  const chars = typed.length;
+  document.getElementById("stat-chars").textContent = chars;
+
+  let correct = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === sentence[i]) correct++;
+  }
+  const acc = typed.length > 0 ? Math.round((correct / typed.length) * 100) : 0;
+  const progress = sentence.length > 0 ? Math.min(Math.round((typed.length / sentence.length) * 100), 100) : 0;
+
+  document.getElementById("stat-acc").textContent = acc + "%";
+  document.getElementById("stat-progress").textContent = progress + "%";
+  document.getElementById("progress-bar").style.width = progress + "%";
+
+  renderSentence(typed, sentence);
+
+  if (typed.length >= sentence.length && !submitted) {
+    submitResult(typed);
+  }
+}
+
+function renderSentence(typed, target) {
+  const box = document.getElementById("sentence-display");
+  let html = "";
+  for (let i = 0; i < target.length; i++) {
+    let cls = "char";
+    if (i < typed.length) {
+      cls += typed[i] === target[i] ? " correct" : " wrong";
+    } else if (i === typed.length) {
+      cls += " cursor";
+    }
+    html += `<span class="${cls}">${target[i] === " " ? "&nbsp;" : escHtml(target[i])}</span>`;
+  }
+  box.innerHTML = html;
+}
+
+function submitResult(typed) {
+  if (submitted) return;
+  submitted = true;
+  const elapsed = (Date.now() - startTime) / 1000;
+  stopTimer();
+  document.getElementById("typing-area").disabled = true;
+  send({ type: "result", typed, elapsed: Math.round(elapsed * 1000) / 1000 });
+  addLog("Hasilmu dikirim ke server. Menunggu lawan menyelesaikan ronde...", "game");
+}
+
+const MEDALS = ["🥇", "🥈", "🥉"];
+
+function showLeaderboard(data) {
+  showScreen("leaderboard");
+  const wrap = document.getElementById("lb-entries");
+  const winnerBanner = document.getElementById("winner-banner");
+  wrap.innerHTML = "";
+
+  if (data.length > 0) {
+    const winner = data[0];
+    winnerBanner.style.display = "block";
+    winnerBanner.innerHTML = winner.name === playerName
+      ? `🎉 Selamat, <strong>${escHtml(winner.name)}</strong> jadi pemenang ronde ini dengan skor <strong>${winner.score}</strong>!`
+      : `✨ Pemenang ronde ini adalah <strong>${escHtml(winner.name)}</strong> dengan skor <strong>${winner.score}</strong>.`;
+  } else {
+    winnerBanner.style.display = "none";
+  }
+
+  data.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = `lb-entry rank-${entry.rank}`;
+    const medal = MEDALS[entry.rank - 1] || `#${entry.rank}`;
+    div.innerHTML = `
+      <div class="lb-rank">${medal}</div>
+      <div class="lb-name">${escHtml(entry.name)}</div>
+      <div>
+        <div class="lb-score">${entry.score}</div>
+        <div class="lb-meta">poin</div>
+      </div>
+      <div class="lb-meta">
+        Akurasi: ${entry.accuracy}%<br>
+        Waktu: ${entry.elapsed}s<br>
+        WPM: ${entry.wpm || 0}
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function playAgain() {
+  if (ws) {
+    try { ws.close(); } catch (_) {}
+  }
+  const host = document.getElementById("input-host").value.trim() || "localhost";
+  const name = playerName || document.getElementById("input-name").value.trim();
+  submitted = false;
+  players = [];
+  clearLogs();
+  hideLoginError();
+  playerName = name;
+  connect(host, name);
+}
+
+function goHome() {
+  if (ws) {
+    try { ws.close(); } catch (_) {}
+    ws = null;
+  }
+  submitted = false;
+  players = [];
+  clearLogs();
+  showScreen("login");
+}
+
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+  document.getElementById("screen-" + name).classList.add("active");
+}
+
+function addLog(text, target = "wait") {
+  const logId = target === "game" ? "info-log-game" : "info-log-wait";
+  const log = document.getElementById(logId);
+  if (!log) return;
+  const p = document.createElement("p");
+  p.textContent = text;
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
+}
+
+function clearLogs() {
+  document.getElementById("info-log-wait").innerHTML = "";
+  document.getElementById("info-log-game").innerHTML = "";
+}
+
+function escHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+</script>
+</body>
+</html>
